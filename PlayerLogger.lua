@@ -400,9 +400,9 @@ local function ShowInfo(LoadId)
 	local LoadData = PlayerData[tostring(LoadId)]
 	if LoadData then
 		UserId.Text ="UserId: ".. LoadData.UserId
-		DisplayName.Text ="@".. LoadData.DisplayName
-		UserName.Text = LoadData.UserName
-		AccountAge.Text = "Account Age(Days):"..LoadData.AccountAge
+		DisplayName.Text =LoadData.DisplayName
+		UserName.Text = "@"..LoadData.UserName
+		AccountAge.Text = "Account Age(Days): "..LoadData.AccountAge
 		LastSeen.Text = "Last Seen: "..UnixTime(LoadData.LastSeen)
 		PlayerImage.Image = GetPlayerImage(LoadData.UserId)
 		LastGame.Text ="Game: ".. game:GetService("MarketplaceService"):GetProductInfo(tonumber(LoadData.GameSeen)).Name
@@ -417,7 +417,7 @@ local function CrateButton(v)
 		local Temp = Template:Clone()
 		Temp.Name = v.UserId
 		Temp.Display.Text = v.DisplayName
-		Temp.User.Text = v.UserName
+		Temp.User.Text = "@"..v.UserName
 		Temp.ImageLabel.Image = GetPlayerImage(v.UserId)
 		Temp.Parent = PlayerList
 		Temp.Visible = true
@@ -436,6 +436,16 @@ if PlayerData and typeof(PlayerData) == "table" then
 			CrateButton(v)
 		end)
 	end
+end
+
+local function UpdateInfo(Player)
+	local Id = Player.UserId
+	PlayerData[tostring(Id)].UserName = Player.Name
+	PlayerData[tostring(Id)].DisplayName = Player.DisplayName
+	PlayerData[tostring(Id)].UserId  = Player.UserId
+	PlayerData[tostring(Id)].AccountAge = Player.AccountAge
+	PlayerData[tostring(Id)].LastSeen = os.time()
+	PlayerData[tostring(Id)].GameSeen = game.PlaceId
 end
 
 local function AddPlayer(Player)
@@ -463,8 +473,8 @@ end)
 for i,v in pairs(game.Players:GetChildren()) do
 	spawn(function()
 		if PlayerData[tostring(v.UserId)] then 
-			PlayerData[tostring(v.UserId)].LastSeen = os.time()
-			PlayerData[tostring(v.UserId)].GameSeen = game.PlaceId
+			UpdateInfo(v)
+
 			Notify(v.Name)
 		else
 			AddPlayer(v)
