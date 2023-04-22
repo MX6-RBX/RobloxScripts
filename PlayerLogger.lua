@@ -422,8 +422,23 @@ local function CrateButton(v)
 		Temp.Parent = PlayerList
 		Temp.Visible = true
 		Temp.LayoutOrder = v.LastSeen
+		if v.IsFriend then 
+            Temp.BackgroundColor3 = Color3.fromRGB(52, 158, 235)
+		end
+	    
 		Temp.MouseButton1Click:Connect(function()
 			ShowInfo(v.UserId)
+		end)
+		Temp.MouseButton2Click:Connect(function()
+		    if v.IsFriend then 
+                v.IsFriend = false
+                SaveFile()
+                Temp.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            else
+                v.IsFriend = true
+                SaveFile()
+                Temp.BackgroundColor3 = Color3.fromRGB(52, 158, 235)
+            end
 		end)
 		Count = Count + 1
 		Top.Text = "Player Log "..Count
@@ -456,7 +471,8 @@ local function AddPlayer(Player)
 			UserId  = Player.UserId,
 			AccountAge = Player.AccountAge,
 			LastSeen = os.time(),
-			GameSeen = game.PlaceId
+			GameSeen = game.PlaceId,
+			IsFriend = false
 		}
 		PlayerData[tostring(Player.UserId)] = Data
 		SaveFile()
@@ -474,11 +490,9 @@ for i,v in pairs(game.Players:GetChildren()) do
 	spawn(function()
 		if PlayerData[tostring(v.UserId)] then 
 			UpdateInfo(v)
-
 			Notify(v.Name)
-		else
+	    else
 			AddPlayer(v)
 		end
 	end)
 end
-
