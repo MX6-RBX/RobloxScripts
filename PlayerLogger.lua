@@ -1,5 +1,8 @@
+local DragLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/MX6-RBX/TestLib/main/DragLib.lua"))()
+
 local FileName = "PlayerLog.txt"
 local HTTP = game:GetService("HttpService")
+local UIS = game:GetService("UserInputService")
 
 local Player = game.Players.LocalPlayer
 local Count = 0
@@ -120,6 +123,7 @@ local UICorner_6 = Instance.new("UICorner")
 PlayerLog.Name = "PlayerLog"
 PlayerLog.Parent = (game:GetService("CoreGui") or gethui())
 
+
 ListFrame.Name = "ListFrame"
 ListFrame.Parent = PlayerLog
 ListFrame.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -127,6 +131,9 @@ ListFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 ListFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
 ListFrame.Size = UDim2.new(0, 200, 0, 450)
 ListFrame.ZIndex = 2
+
+local DragFrame = DragLib:new(ListFrame)
+DragFrame:Enable()
 
 UICorner.Parent = ListFrame
 
@@ -488,11 +495,22 @@ end)
 
 for i,v in pairs(game.Players:GetChildren()) do
 	spawn(function()
-		if PlayerData[tostring(v.UserId)] then 
-			UpdateInfo(v)
-			Notify(v.Name)
-	    else
-			AddPlayer(v)
+	    if v ~= Player then 
+    		if PlayerData[tostring(v.UserId)]  then 
+    			UpdateInfo(v)
+    			if v.UserId ~= Player.UserId then
+    		    	Notify(v.Name)
+    			end
+    	    else
+    			AddPlayer(v)
+    		end
 		end
-	end)
+    end)
 end
+UIS.InputBegan:Connect(function(Input)
+    if UIS:GetFocusedTextBox() == nil then
+        if Input.KeyCode == Enum.KeyCode.O then 
+            ListFrame.Visible = not ListFrame.Visible
+        end
+    end 
+end)
